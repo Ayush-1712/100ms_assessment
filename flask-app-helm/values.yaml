@@ -1,0 +1,15 @@
+
+replicaCount: 1
+image:
+  repository: ayush1712/flask-hello-world
+  tag: latest
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 5000
+
+deployment:
+  name: flask-app
+  labels:
+    app: flask
