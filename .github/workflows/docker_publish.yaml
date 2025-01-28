@@ -1,0 +1,58 @@
+name: Build and Deploy Flask App to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v2  
+    
+    # Set up Docker Buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    # Log in to Docker Hub using GitHub secrets
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    # Build and push image
+    - name: Build and Push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: . 
+        file: ./Dockerfile 
+        push: true  
+        tags: ${{ secrets.DOCKER_USERNAME }}/flask-hello-world:latest
+
+
+  deploy_to_k8s:
+    runs-on: self-hosted  # Ensure you're using a self-hosted runner
+    needs: build_and_push 
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # Authenticate with the Kubernetes cluster (Minikube)
+    - name: Set up kubectl to access local Minikube
+      run: |
+        echo "Using existing Minikube setup."
+        echo "Make sure your kubectl is configured to connect to your local Minikube cluster."
+      
+    # Deploy Flask app to Kubernetes
+    - name: Deploy Flask app to Kubernetes
+      run: kubectl apply -f flask_deployment.yaml
+
+    # Deploy Flask service to Kubernetes
+    - name: Deploy Flask service to Kubernetes
+      run: kubectl apply -f flask_service.yaml
