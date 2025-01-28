@@ -3,7 +3,7 @@ name: Build and Deploy Flask App to Kubernetes
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build_and_push:
