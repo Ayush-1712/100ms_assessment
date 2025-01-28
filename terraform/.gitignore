@@ -8,6 +8,7 @@ terraform.tfstate.d/
 crash.log
 *.zip
 *.log
+.terraform.lock.hcl
 
 # Kubernetes
 *.kube/config
